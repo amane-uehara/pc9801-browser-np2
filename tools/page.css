@@ -1,0 +1,117 @@
+html, body { margin: 0; padding: 0; background: #111; color: #ddd;
+  font-family: sans-serif; }
+#wrap { display: flex; flex-direction: column; align-items: center;
+  padding: 10px 0 30px; gap: 8px; }
+#toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  justify-content: center; }
+.ctl { display: flex; gap: 5px; align-items: center; font-size: 13px; color: #aaa; }
+#speed { width: 140px; }
+#speed-val { min-width: 42px; display: inline-block; text-align: right;
+  font-variant-numeric: tabular-nums; }
+#speed-warn { font-size: 11px; color: #d9a441; }
+#libbar { display: flex; gap: 10px; align-items: center; justify-content: center; }
+#lib-select { max-width: 320px; }
+#libbar button { padding: 3px 10px; font-size: 12px; }
+#kb-head .target { font-size: 12px; color: #26537d; font-weight: bold; }
+#fddbar { display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+  justify-content: center; font-size: 12px; color: #aaa; }
+.fdd-slot { display: flex; gap: 6px; align-items: center; }
+.fdd-name { color: #9ac; max-width: 220px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+.fdd-slot button { padding: 2px 8px; font-size: 12px; }
+#monitor { border-radius: 10px; }
+#monitor.framed { background: linear-gradient(#e2dfd6, #cfccc1 60%, #bab6aa);
+  padding: 34px 38px 46px; border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.6),
+  inset 0 1px 0 rgba(255,255,255,.7), inset 0 -2px 6px rgba(0,0,0,.25); }
+#glass { border-radius: 4px; }
+#monitor.framed #glass { background: #000; border-radius: 12px; }
+#screen-box { position: relative; }
+canvas { width: 640px; height: 400px; background: #000;
+  image-rendering: pixelated; outline: none; display: block; }
+@media (min-width: 1400px) { canvas { width: 960px; height: 600px; } }
+#raster-glow { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%,
+    rgba(150, 170, 190, 0.085), rgba(130, 150, 170, 0.04) 85%);
+  opacity: 0; }
+#scanlines { position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(to bottom,
+    rgba(0,0,0,1) 0, rgba(0,0,0,1) 25%, transparent 25%, transparent 100%);
+  background-size: 100% 0.5%;
+  opacity: 0; }
+#crt-panel { background: #1c1c20; border: 1px solid #333; border-radius: 6px;
+  padding: 12px 20px; display: flex; flex-direction: row; gap: 28px;
+  align-items: center; font-size: 13px; color: #aaa; }
+#crt-sliders { display: flex; flex-direction: column; gap: 6px; }
+#crt-sliders label { display: flex; gap: 10px; align-items: center; }
+#crt-sliders .nm { min-width: 6.5em; text-align: right; }
+#crt-sliders input[type=range] { width: 170px; }
+#crt-sliders .vl { min-width: 42px; text-align: right; color: #9ac;
+  font-variant-numeric: tabular-nums; }
+#crt-side { display: flex; flex-direction: column; gap: 10px;
+  align-items: stretch; }
+#crt-side label { display: flex; gap: 6px; align-items: center; }
+#overlay { position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: center; background: rgba(0,0,0,.75); cursor: pointer;
+  font-size: 22px; color: #fff; user-select: none; }
+.hidden { display: none !important; }
+button { background: #333; color: #ddd; border: 1px solid #555;
+  padding: 5px 12px; cursor: pointer; font-size: 13px; border-radius: 3px; }
+button:hover { background: #444; }
+button.active { background: #265a8a; border-color: #4a8ac0; }
+select, input[type=text] { background: #222; color: #ddd; border: 1px solid #555;
+  padding: 4px 6px; font-size: 13px; border-radius: 3px; }
+#status { font-size: 13px; color: #999; }
+#btn-reset { background: #d9b125; color: #241f05; border-color: #96790e;
+  font-weight: bold; }
+#btn-reset:hover { background: #e8c33e; }
+#hint { font-size: 12px; color: #777; max-width: 700px; text-align: center;
+  line-height: 1.6; }
+
+/* ---- virtual keyboard (NEC PC-9801 original) ---- */
+#vkbd { display: flex; flex-direction: column; gap: 8px; align-items: center;
+  background: #cfc8b6; border: 1px solid #9a9384; border-radius: 8px;
+  padding: 12px 14px 14px; user-select: none; max-width: 96vw;
+  overflow-x: auto; box-shadow: inset 0 2px 6px rgba(255,255,255,.5),
+  0 4px 10px rgba(0,0,0,.5); }
+#kb-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  justify-content: center; width: 100%; }
+#kb-head .msg { font-size: 12px; color: #5a5348; min-height: 16px; }
+#kb-head .msg.wait { color: #a05e10; font-weight: bold; }
+#kb-maps { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.map-chip { display: inline-flex; gap: 5px; align-items: center;
+  background: #eae4d4; border: 1px solid #9a9384; border-radius: 10px;
+  padding: 1px 4px 1px 8px; font-size: 11px; color: #3a352c; }
+.map-chip b { font-weight: 600; }
+.map-chip span.x { cursor: pointer; padding: 0 4px; color: #86230f;
+  font-weight: bold; }
+.map-chip span.x:hover { background: #d8cfba; border-radius: 8px; }
+#kb-inner { position: relative; }
+.key { position: absolute; box-sizing: border-box; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; touch-action: none; line-height: 1;
+  font-size: 11px; font-weight: 600; }
+.key .m { white-space: pre; text-align: center; font-size: 11px; }
+.key .ss { position: absolute; top: 2px; right: 3px; font-size: 7px;
+  font-weight: 400; }
+.key .sk { position: absolute; bottom: 2px; right: 3px; font-size: 7px;
+  font-weight: 400; color: #7a5a2a; }
+.key.lt { background: linear-gradient(#e8e2d2, #d9d2c0); color: #3a352c;
+  border: 1px solid #a49a86; border-bottom: 3px solid #948a76;
+  box-shadow: 0 1px 1px rgba(0,0,0,.25); }
+.key.dk { background: linear-gradient(#7d766a, #6d6659); color: #f2eee4;
+  border: 1px solid #4d4739; border-bottom: 3px solid #453f33;
+  box-shadow: 0 1px 1px rgba(0,0,0,.3); }
+.key.dk .m { font-size: 9px; }
+.key.dk .sk { color: #d8cfb8; }
+.key:hover { filter: brightness(1.08); }
+.key.down { filter: brightness(0.85); border-bottom-width: 1px;
+  transform: translateY(2px); }
+.key.return { clip-path: polygon(0 0, 100% 0, 100% 100%, 19% 100%, 19% 50%, 0 50%);
+  border-bottom-width: 1px; }
+.key.return .m { position: absolute; left: 58%; top: 50%;
+  transform: translate(-50%, -50%); font-size: 15px; }
+#vkbd.assign .key { outline: 1px dashed #a05e10; outline-offset: -3px; }
+.key.assign-wait { outline: 2px solid #c8500a !important; outline-offset: 0;
+  animation: blink .7s infinite alternate; }
+@keyframes blink { from { filter: brightness(1); } to { filter: brightness(1.35); } }

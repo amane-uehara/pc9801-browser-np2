@@ -1,0 +1,18 @@
+# 著作権物（ROM・ディスクイメージ）は絶対にコミットしない
+fddimage.zip
+!fddimage_sample.zip
+fddimage/
+fddimage_backup/
+bios/
+*.D88
+*.d88
+*.tfd
+*.TFD
+*.fdi
+*.FDI
+*.ROM
+*.rom
+# ローカル作業ファイル
+*.png
+*:Zone.Identifier
+.claude/
