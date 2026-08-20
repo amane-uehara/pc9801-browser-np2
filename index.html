@@ -8,10 +8,9 @@ html, body { margin: 0; padding: 0; background: #111; color: #ddd;
   font-family: sans-serif; }
 #wrap { display: flex; flex-direction: column; align-items: center;
   padding: 10px 0 30px; gap: 8px; }
-#toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-  justify-content: center; }
+#toolbar { display: flex; flex-direction: column; gap: 10px;
+  border-top: 1px solid #333; padding-top: 14px; }
 .ctl { display: flex; gap: 5px; align-items: center; font-size: 13px; color: #aaa; }
-#speed { width: 140px; }
 #speed-val { min-width: 42px; display: inline-block; text-align: right;
   font-variant-numeric: tabular-nums; }
 #speed-warn { font-size: 11px; color: #d9a441; }
@@ -19,8 +18,14 @@ html, body { margin: 0; padding: 0; background: #111; color: #ddd;
 #lib-select { max-width: 320px; }
 #libbar button { padding: 3px 10px; font-size: 12px; }
 #kb-head .target { font-size: 12px; color: #26537d; font-weight: bold; }
-#fddbar { display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
-  justify-content: center; font-size: 12px; color: #aaa; }
+#fddbar { display: flex; flex-direction: column; gap: 8px;
+  font-size: 13px; color: #aaa; }
+#fddbar .ctl { display: flex; gap: 6px; align-items: center; width: 100%; }
+#fddbar select { flex: 1 1 0; width: 0; min-width: 0; max-width: none; }
+#lib-ready { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+#lib-missing { width: 100%; }
+#lib-missing button { width: 100%; }
+#lib-ready button { width: 100%; }
 .fdd-slot { display: flex; gap: 6px; align-items: center; }
 .fdd-name { color: #9ac; max-width: 220px; overflow: hidden;
   text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
@@ -35,7 +40,7 @@ html, body { margin: 0; padding: 0; background: #111; color: #ddd;
 #screen-box { position: relative; }
 canvas { width: 640px; height: 400px; background: #000;
   image-rendering: pixelated; outline: none; display: block; }
-@media (min-width: 1400px) { canvas { width: 960px; height: 600px; } }
+
 #raster-glow { position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(ellipse at 50% 45%,
     rgba(150, 170, 190, 0.085), rgba(130, 150, 170, 0.04) 85%);
@@ -45,18 +50,37 @@ canvas { width: 640px; height: 400px; background: #000;
     rgba(0,0,0,1) 0, rgba(0,0,0,1) 25%, transparent 25%, transparent 100%);
   background-size: 100% 0.5%;
   opacity: 0; }
-#crt-panel { background: #1c1c20; border: 1px solid #333; border-radius: 6px;
-  padding: 12px 20px; display: flex; flex-direction: row; gap: 28px;
-  align-items: center; font-size: 13px; color: #aaa; }
+#main-row { display: flex; align-items: center; width: 100%;
+  min-height: calc(100vh - 14px); }
+#left-col { flex: 0 0 auto; margin-left: 12px;
+  display: flex; flex-direction: column; gap: 14px; }
+#mon-area { flex: 1 1 0; min-width: 0; display: flex;
+  justify-content: center; }
+@media (max-width: 1100px) {
+  #main-row { flex-wrap: wrap; justify-content: center; gap: 14px; }
+  #left-col { margin: 0; }
+  #mon-area { flex-basis: 100%; }
+}
+#crt-panel, #ops-panel { background: #1c1c20; border: 1px solid #333;
+  border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column;
+  gap: 16px; align-items: stretch; font-size: 13px; color: #aaa; }
 #crt-sliders { display: flex; flex-direction: column; gap: 6px; }
 #crt-sliders label { display: flex; gap: 10px; align-items: center; }
 #crt-sliders .nm { min-width: 6.5em; text-align: right; }
-#crt-sliders input[type=range] { width: 170px; }
+#crt-sliders input[type=range] { width: 88px; }
 #crt-sliders .vl { min-width: 42px; text-align: right; color: #9ac;
   font-variant-numeric: tabular-nums; }
 #crt-side { display: flex; flex-direction: column; gap: 10px;
-  align-items: stretch; }
-#crt-side label { display: flex; gap: 6px; align-items: center; }
+  align-items: stretch; border-top: 1px solid #333; padding-top: 14px; }
+.prow { display: flex; gap: 10px; align-items: center; width: 100%; }
+.prow > button { flex: 1; }
+.prow > label { flex: 1; display: flex; gap: 6px; align-items: center;
+  white-space: nowrap; font-size: 12px; }
+.prow > input[type=range] { flex: 1; width: auto; }
+.prow > select { flex: 1 1 0; width: 0; min-width: 0; font-size: 12px; }
+.prow > .nm { text-align: right; }
+.prow > .vl { min-width: 42px; text-align: right; color: #9ac;
+  font-variant-numeric: tabular-nums; }
 #overlay { position: absolute; inset: 0; display: flex; align-items: center;
   justify-content: center; background: rgba(0,0,0,.75); cursor: pointer;
   font-size: 22px; color: #fff; user-select: none; }
@@ -67,7 +91,10 @@ button:hover { background: #444; }
 button.active { background: #265a8a; border-color: #4a8ac0; }
 select, input[type=text] { background: #222; color: #ddd; border: 1px solid #555;
   padding: 4px 6px; font-size: 13px; border-radius: 3px; }
-#status { font-size: 13px; color: #999; }
+#status { position: fixed; left: 12px; bottom: 10px; z-index: 40;
+  font-size: 13px; color: #ccc; background: rgba(20, 22, 28, .85);
+  border: 1px solid #444; border-radius: 5px; padding: 5px 12px;
+  pointer-events: none; }
 #btn-reset { background: #d9b125; color: #241f05; border-color: #96790e;
   font-weight: bold; }
 #btn-reset:hover { background: #e8c33e; }
@@ -126,21 +153,53 @@ select, input[type=text] { background: #222; color: #ddd; border: 1px solid #555
 </head>
 <body>
 <div id="wrap">
-  <div id="monitor"><div id="glass">
-  <div id="screen-box">
-    <canvas id="canvas" width="640" height="400" tabindex="1"></canvas>
-    <div id="raster-glow"></div>
-    <div id="scanlines"></div>
-    <div id="overlay">クリックして電源ON</div>
+  <div id="main-row">
+  <div id="left-col">
+  <div id="crt-panel">
+    <div id="crt-sliders">
+      <label><span class="nm">明るさ</span><input id="crt-br" type="range" min="40" max="120" step="1"><span id="crt-br-v" class="vl"></span></label>
+      <label><span class="nm">彩度</span><input id="crt-sat" type="range" min="30" max="120" step="1"><span id="crt-sat-v" class="vl"></span></label>
+      <label><span class="nm">コントラスト</span><input id="crt-con" type="range" min="60" max="120" step="1"><span id="crt-con-v" class="vl"></span></label>
+      <label><span class="nm">走査線</span><input id="crt-scan" type="range" min="0" max="60" step="1"><span id="crt-scan-v" class="vl"></span></label>
+      <label><span class="nm">にじみ</span><input id="crt-blur" type="range" min="0" max="100" step="1"><span id="crt-blur-v" class="vl"></span></label>
+      <label><span class="nm">湾曲</span><input id="crt-curve" type="range" min="0" max="100" step="1"><span id="crt-curve-v" class="vl"></span></label>
+      <label><span class="nm">余白</span><input id="crt-margin" type="range" min="0" max="60" step="1"><span id="crt-margin-v" class="vl"></span></label>
+    </div>
+    <div id="crt-side">
+      <div class="prow">
+        <button id="crt-preset-crt">ブラウン管風</button>
+        <button id="crt-preset-off">補正なし</button>
+      </div>
+      <div class="prow">
+        <label><input id="crt-fill200" type="checkbox" checked>200ライン補間</label>
+        <label><input id="dispsync" type="checkbox" checked>チラつき低減</label>
+      </div>
+    </div>
   </div>
-  </div></div>
-  <div id="status">ロード中...</div>
+  <div id="ops-panel">
+  <div id="fddbar">
+    <span id="lib-missing" class="ctl">
+      <button id="zip-pick">fddimage.zipを読み込む</button>
+      <input type="file" id="zip-file" class="hidden" accept=".zip">
+    </span>
+    <span id="lib-ready" class="ctl hidden">
+      <label class="ctl">FDD1 <select id="fdd0-sel"><option value="">（空）</option></select></label>
+      <label class="ctl">FDD2 <select id="fdd1-sel"><option value="">（空）</option></select></label>
+      <button id="zip-change" title="別のfddimage.zipを読み込み直す">zip変更</button>
+    </span>
+  </div>
   <div id="toolbar">
-    <button id="btn-reset">リセット</button>
-    <button id="btn-pause">一時停止</button>
-    <label class="ctl">速度 <input id="speed" type="range" min="10" max="300" step="5" value="100">
-      <span id="speed-val">100%</span></label>
-    <label class="ctl">CPU
+    <div class="prow">
+      <button id="btn-reset">リセット</button>
+      <button id="btn-pause">一時停止</button>
+    </div>
+    <div class="prow">
+      <span class="nm">速度</span>
+      <input id="speed" type="range" min="10" max="300" step="5" value="100">
+      <span id="speed-val" class="vl">100%</span>
+    </div>
+    <div class="prow">
+      <span class="nm">CPU</span>
       <select id="cpu-clock">
         <optgroup label="2.5MHz系">
           <option value="2457600,1">2.5MHz</option>
@@ -155,27 +214,29 @@ select, input[type=text] { background: #222; color: #ddd; border: 1px solid #555
           <option value="1996800,8">16MHz</option>
         </optgroup>
       </select>
-    </label>
-    <label class="ctl">音遅延
+      <span class="nm">遅延</span>
       <select id="latency">
         <option value="50">50ms</option>
         <option value="100" selected>100ms</option>
         <option value="150">150ms</option>
         <option value="250">250ms</option>
       </select>
-    </label>
+    </div>
   </div>
-  <div id="fddbar">
-    <span id="lib-missing" class="ctl">
-      <button id="zip-pick">fddimage.zipを読み込む</button>
-      <input type="file" id="zip-file" class="hidden" accept=".zip">
-    </span>
-    <span id="lib-ready" class="ctl hidden">
-      <label class="ctl">FDD1 <select id="fdd0-sel"><option value="">（空）</option></select></label>
-      <label class="ctl">FDD2 <select id="fdd1-sel"><option value="">（空）</option></select></label>
-      <button id="zip-change" title="別のfddimage.zipを読み込み直す">zip変更</button>
-    </span>
   </div>
+  </div>
+  <div id="mon-area">
+  <div id="monitor"><div id="glass">
+  <div id="screen-box">
+    <canvas id="canvas" width="640" height="400" tabindex="1"></canvas>
+    <div id="raster-glow"></div>
+    <div id="scanlines"></div>
+    <div id="overlay">クリックして電源ON</div>
+  </div>
+  </div></div>
+  </div>
+  </div>
+  <div id="status"></div>
   <div id="speed-warn" class="hidden">※速度スライダーの低速はコマ落ちします。滑らかなまま動作を遅くするにはCPUクロックを下げてください</div>
   <svg width="0" height="0" style="position:absolute">
     <filter id="nijimi" x="-5%" y="-5%" width="110%" height="110%">
@@ -187,23 +248,6 @@ select, input[type=text] { background: #222; color: #ddd; border: 1px solid #555
         scale="0" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </svg>
-  <div id="crt-panel">
-    <div id="crt-sliders">
-      <label><span class="nm">明るさ</span><input id="crt-br" type="range" min="40" max="120" step="1"><span id="crt-br-v" class="vl"></span></label>
-      <label><span class="nm">彩度</span><input id="crt-sat" type="range" min="30" max="120" step="1"><span id="crt-sat-v" class="vl"></span></label>
-      <label><span class="nm">コントラスト</span><input id="crt-con" type="range" min="60" max="120" step="1"><span id="crt-con-v" class="vl"></span></label>
-      <label><span class="nm">走査線</span><input id="crt-scan" type="range" min="0" max="60" step="1"><span id="crt-scan-v" class="vl"></span></label>
-      <label><span class="nm">にじみ</span><input id="crt-blur" type="range" min="0" max="100" step="1"><span id="crt-blur-v" class="vl"></span></label>
-      <label><span class="nm">湾曲</span><input id="crt-curve" type="range" min="0" max="100" step="1"><span id="crt-curve-v" class="vl"></span></label>
-      <label><span class="nm">余白</span><input id="crt-margin" type="range" min="0" max="60" step="1"><span id="crt-margin-v" class="vl"></span></label>
-    </div>
-    <div id="crt-side">
-      <button id="crt-preset-crt">ブラウン管風</button>
-      <button id="crt-preset-off">補正なし</button>
-      <label><input id="crt-fill200" type="checkbox" checked>200ライン補間</label>
-      <label><input id="dispsync" type="checkbox" checked>チラつき低減</label>
-    </div>
-  </div>
   <div id="vkbd">
     <div id="kb-head">
       <button id="btn-assign">割当モード</button>
@@ -260,6 +304,7 @@ window.__np2factory = Module;
   // ---------- settings ----------
   var settings = { clkBase: 2457600, clkMult: 4, speed: 100, dispSync: true,
     latency: 100, fill200: true, remapByImage: {}, lastImage: '', history: [],
+    lastFdd: ['', ''],
     crt: { br: 90, sat: 50, con: 90, scan: 0, blur: 25, curve: 30, margin: 30 } };
   var autoStart = false;
   function loadSettings() {
@@ -298,14 +343,14 @@ window.__np2factory = Module;
   }
 
   // ---------- module state ----------
-  var statusEl = document.getElementById('status');
   var overlay = document.getElementById('overlay');
   var canvas = document.getElementById('canvas');
   var module = null;
   var state = 'init';
   function setStatus(s) {
-    var mhz = (settings.clkBase * settings.clkMult / 1e6).toFixed(1);
-    statusEl.textContent = s + '  |  CPU ' + mhz + 'MHz  速度 ' + settings.speed + '%';
+    var el = document.getElementById('status');
+    el.textContent = s;
+    el.classList.toggle('hidden', !s);
   }
 
   var config = {
@@ -464,13 +509,24 @@ window.__np2factory = Module;
         });
       });
       renderHistory();
+      [0, 1].forEach(function(drive) {
+        var name = (settings.lastFdd || [])[drive];
+        if (!name || !zipEntries.has(name)) return;
+        var sel = document.getElementById('fdd' + drive + '-sel');
+        if (sel && sel.value) return;      // something is already mounted
+        extractEntry(name).then(function(bytes) {
+          mountDisk(drive, name, bytes, true);
+        }).catch(function(e) { console.warn('FDD復元失敗:', name, e); });
+      });
       document.getElementById('lib-missing').classList.add('hidden');
       document.getElementById('lib-ready').classList.remove('hidden');
-      setStatus('ライブラリ準備完了（' + libIndex.length + 'タイトル）');
+      var nDisks = libIndex.filter(function(e) {
+        return /\.(d88|88d|d98|98d|fdi|tfd|xdf|hdm)$/i.test(e.filename);
+      }).length;
+      setStatus('ライブラリ準備完了（' + nDisks + 'タイトル）');
       if (persist) {
         idbSet('zipData', new Blob([u8])).then(function() {
-          setStatus('ライブラリ準備完了（' + libIndex.length +
-            'タイトル・ブラウザに保存済み。次回から自動読込）');
+          setStatus('ライブラリをブラウザに保存しました。次回から自動読込されます');
         }).catch(function(e) { console.warn('zip cache failed:', e); });
       }
     });
@@ -687,15 +743,17 @@ window.__np2factory = Module;
       ['number', 'string', 'number', 'number'], [drive, fsname, 0, 0]);
   }
 
-  function mountDisk(drive, name, bytes) {
-    pushHistory(name);
+  function mountDisk(drive, name, bytes, restoring) {
+    if (!restoring) pushHistory(name);
     syncFddSelect(drive, name);
+    if (!settings.lastFdd) settings.lastFdd = ['', ''];
+    settings.lastFdd[drive] = (zipEntries && zipEntries.has(name)) ? name : '';
     if (drive === 0) {
       activeImage = name;
       if (zipEntries && zipEntries.has(name)) settings.lastImage = name;
-      saveSettings();
       renderMaps();
     }
+    saveSettings();
     if (module && (state === 'running' || state === 'paused' || state === 'exited')) {
       fsMount(drive, name, bytes);
       setStatus('FDD' + (drive + 1) + 'に「' + name + '」をセット — リセットで起動');
@@ -759,6 +817,7 @@ window.__np2factory = Module;
 
   function ejectDisk(drive) {
     pendingDisks[drive] = null;
+    if (settings.lastFdd) { settings.lastFdd[drive] = ''; saveSettings(); }
     if (module && state !== 'init' && state !== 'starting') {
       module.ccall('diskdrv_setfddex', undefined,
         ['number', 'number', 'number', 'number'], [drive, 0, 0, 0]);
@@ -1207,7 +1266,7 @@ window.__np2factory = Module;
     var scale = (c.curve / 100) * 0.08 * (rect.width || 640);
     document.getElementById('curve-disp').setAttribute('scale', scale.toFixed(2));
   }
-  window.addEventListener('resize', function() { updateCurveFilter(); });
+  window.addEventListener('resize', function() { applyCrt(); });
   var lastMaskCurve = -1;
   function updateCurveMask() {
     var c = settings.crt;
@@ -1244,6 +1303,20 @@ window.__np2factory = Module;
     g.style.maskImage = g.style.webkitMaskImage = u2;
     g.style.maskSize = g.style.webkitMaskSize = '100% 100%';
   }
+  // size the monitor to fill the viewport rectangle left over beside the panel
+  function fitMonitor() {
+    var monArea = document.getElementById('mon-area');
+    var mon = document.getElementById('monitor');
+    if (!monArea || !mon) return;
+    var extraW = mon.offsetWidth - canvas.offsetWidth;    // bezel + glass margin
+    var extraH = mon.offsetHeight - canvas.offsetHeight;
+    var availW = monArea.clientWidth - extraW - 24;
+    var availH = window.innerHeight - extraH - 24;
+    var scale = Math.max(1, Math.min(availW / 640, availH / 400));
+    canvas.style.width = Math.round(640 * scale) + 'px';
+    canvas.style.height = Math.round(400 * scale) + 'px';
+  }
+
   function applyCrt() {
     var c = settings.crt;
     if (c.blur === undefined) c.blur = 0;    // settings saved by older versions
@@ -1259,6 +1332,7 @@ window.__np2factory = Module;
     var glass = document.getElementById('glass');
     mon.classList.toggle('framed', c.margin > 0);
     glass.style.padding = c.margin > 0 ? c.margin + 'px' : '0';
+    fitMonitor();
     updateCurveFilter();
     updateCurveMask();
     canvas.style.filter = 'brightness(' + (c.br / 100) + ') saturate(' +

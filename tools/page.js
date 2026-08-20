@@ -19,6 +19,7 @@
   // ---------- settings ----------
   var settings = { clkBase: 2457600, clkMult: 4, speed: 100, dispSync: true,
     latency: 100, fill200: true, remapByImage: {}, lastImage: '', history: [],
+    lastFdd: ['', ''],
     crt: { br: 90, sat: 50, con: 90, scan: 0, blur: 25, curve: 30, margin: 30 } };
   var autoStart = false;
   function loadSettings() {
@@ -57,14 +58,14 @@
   }
 
   // ---------- module state ----------
-  var statusEl = document.getElementById('status');
   var overlay = document.getElementById('overlay');
   var canvas = document.getElementById('canvas');
   var module = null;
   var state = 'init';
   function setStatus(s) {
-    var mhz = (settings.clkBase * settings.clkMult / 1e6).toFixed(1);
-    statusEl.textContent = s + '  |  CPU ' + mhz + 'MHz  速度 ' + settings.speed + '%';
+    var el = document.getElementById('status');
+    el.textContent = s;
+    el.classList.toggle('hidden', !s);
   }
 
   var config = {
@@ -223,13 +224,24 @@
         });
       });
       renderHistory();
+      [0, 1].forEach(function(drive) {
+        var name = (settings.lastFdd || [])[drive];
+        if (!name || !zipEntries.has(name)) return;
+        var sel = document.getElementById('fdd' + drive + '-sel');
+        if (sel && sel.value) return;      // something is already mounted
+        extractEntry(name).then(function(bytes) {
+          mountDisk(drive, name, bytes, true);
+        }).catch(function(e) { console.warn('FDD復元失敗:', name, e); });
+      });
       document.getElementById('lib-missing').classList.add('hidden');
       document.getElementById('lib-ready').classList.remove('hidden');
-      setStatus('ライブラリ準備完了（' + libIndex.length + 'タイトル）');
+      var nDisks = libIndex.filter(function(e) {
+        return /\.(d88|88d|d98|98d|fdi|tfd|xdf|hdm)$/i.test(e.filename);
+      }).length;
+      setStatus('ライブラリ準備完了（' + nDisks + 'タイトル）');
       if (persist) {
         idbSet('zipData', new Blob([u8])).then(function() {
-          setStatus('ライブラリ準備完了（' + libIndex.length +
-            'タイトル・ブラウザに保存済み。次回から自動読込）');
+          setStatus('ライブラリをブラウザに保存しました。次回から自動読込されます');
         }).catch(function(e) { console.warn('zip cache failed:', e); });
       }
     });
@@ -446,15 +458,17 @@
       ['number', 'string', 'number', 'number'], [drive, fsname, 0, 0]);
   }
 
-  function mountDisk(drive, name, bytes) {
-    pushHistory(name);
+  function mountDisk(drive, name, bytes, restoring) {
+    if (!restoring) pushHistory(name);
     syncFddSelect(drive, name);
+    if (!settings.lastFdd) settings.lastFdd = ['', ''];
+    settings.lastFdd[drive] = (zipEntries && zipEntries.has(name)) ? name : '';
     if (drive === 0) {
       activeImage = name;
       if (zipEntries && zipEntries.has(name)) settings.lastImage = name;
-      saveSettings();
       renderMaps();
     }
+    saveSettings();
     if (module && (state === 'running' || state === 'paused' || state === 'exited')) {
       fsMount(drive, name, bytes);
       setStatus('FDD' + (drive + 1) + 'に「' + name + '」をセット — リセットで起動');
@@ -518,6 +532,7 @@
 
   function ejectDisk(drive) {
     pendingDisks[drive] = null;
+    if (settings.lastFdd) { settings.lastFdd[drive] = ''; saveSettings(); }
     if (module && state !== 'init' && state !== 'starting') {
       module.ccall('diskdrv_setfddex', undefined,
         ['number', 'number', 'number', 'number'], [drive, 0, 0, 0]);
@@ -966,7 +981,7 @@
     var scale = (c.curve / 100) * 0.08 * (rect.width || 640);
     document.getElementById('curve-disp').setAttribute('scale', scale.toFixed(2));
   }
-  window.addEventListener('resize', function() { updateCurveFilter(); });
+  window.addEventListener('resize', function() { applyCrt(); });
   var lastMaskCurve = -1;
   function updateCurveMask() {
     var c = settings.crt;
@@ -1003,6 +1018,20 @@
     g.style.maskImage = g.style.webkitMaskImage = u2;
     g.style.maskSize = g.style.webkitMaskSize = '100% 100%';
   }
+  // size the monitor to fill the viewport rectangle left over beside the panel
+  function fitMonitor() {
+    var monArea = document.getElementById('mon-area');
+    var mon = document.getElementById('monitor');
+    if (!monArea || !mon) return;
+    var extraW = mon.offsetWidth - canvas.offsetWidth;    // bezel + glass margin
+    var extraH = mon.offsetHeight - canvas.offsetHeight;
+    var availW = monArea.clientWidth - extraW - 24;
+    var availH = window.innerHeight - extraH - 24;
+    var scale = Math.max(1, Math.min(availW / 640, availH / 400));
+    canvas.style.width = Math.round(640 * scale) + 'px';
+    canvas.style.height = Math.round(400 * scale) + 'px';
+  }
+
   function applyCrt() {
     var c = settings.crt;
     if (c.blur === undefined) c.blur = 0;    // settings saved by older versions
@@ -1018,6 +1047,7 @@
     var glass = document.getElementById('glass');
     mon.classList.toggle('framed', c.margin > 0);
     glass.style.padding = c.margin > 0 ? c.margin + 'px' : '0';
+    fitMonitor();
     updateCurveFilter();
     updateCurveMask();
     canvas.style.filter = 'brightness(' + (c.br / 100) + ') saturate(' +
